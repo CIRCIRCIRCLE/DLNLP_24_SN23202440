@@ -90,4 +90,4 @@ print(ad_processed.iloc[0])
 
 combined = pd.concat([fingpt_processed, alpaca_processed, fin_llama_processed, ad_processed], ignore_index=True)
 print(len(combined))
-combined.to_csv('../Datasets/FinQA.csv', index=False)
+combined.to_csv('FinQA.csv', index=False)

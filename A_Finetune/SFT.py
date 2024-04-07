@@ -12,6 +12,24 @@ from huggingface_hub import notebook_login
 seed = 42
 set_seed(seed)
 
+from huggingface_hub import login
+import os
+
+'''
+make sure to inter your HuggingFace token in the env using 'export HF_ACCESS_TOKEN=hf_**********'
+run the code using the script:
+    python sft2.py --model_name "circircircle/GeneralQA-phi2" --dataset "circircircle/FinQA" --repo_name "circircircle/FinQA-phi2"
+
+    model_name represents the pretrained model; the repo_name represents the trained model.
+    
+'''
+access_token = os.getenv("HF_ACCESS_TOKEN")
+
+if access_token is not None:
+    login(token=access_token, add_to_git_credential=True)
+else:
+    print("Hugging Face access token not found. Please set it as an environment variable.")
+    
 ##############################################################################
 # dataset preparation
 ##############################################################################
@@ -107,7 +125,7 @@ def create_peft_config(modules):
     :param modules: Names of the modules to apply Lora to
     """
     config = LoraConfig(
-        r=32,           # dimension of the updated matrices
+        r=256,           # dimension of the updated matrices
         lora_alpha=64,  # parameter for scaling
         target_modules=modules,
         lora_dropout=0.1,  # dropout probability for layers
@@ -167,6 +185,7 @@ def train(model, tokenizer, dataset_train, dataset_val, output_dir):
 
     # Create PEFT config for these modules and wrap the model to PEFT
     peft_config = create_peft_config(modules)
+    model.add_adapter(peft_config)
     model = get_peft_model(model, peft_config)
 
     # Print information about the percentage of trainable parameters
@@ -230,14 +249,27 @@ def train(model, tokenizer, dataset_train, dataset_val, output_dir):
 
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description='Train a model with QLoRA and BitsAndBytes.')
+    # Parse arguments
+    parser.add_argument('--model_name', type=str, default='microsoft/phi-2', help='Model name or path')
+    parser.add_argument('--dataset', type=str, default='circircircle/FinQA', help='Dataset to use for training')
+    parser.add_argument('--repo_name', type=str, default='circircircle/FinQA-phi2', help='Repository name for Hugging Face Hub')
 
+    
+    args = parser.parse_args()
+
+    # Use arguments
+    model_name = args.model_name  #'microsoft/phi-2'  'circircircle/GeneralQA-phi2' 
+    dataset_name = args.dataset   #'circircircle/generalQA'   'circircircle/FinQA'
+    repo_name = args.repo_name    #'circircircle/GeneralQA-phi2'  'circircircle/FinQA-phi2'
+
+    #-----------------------------------------------------------------------------------
     # Load dataset from Hugging Face
-    dataset = load_dataset("circircircle/generalQA")
+    dataset = load_dataset(dataset_name)
     print(f'Number of prompts: {len(dataset)}')
     print(f'Column names are: {dataset.column_names}')
 
     # Load model
-    model_name = "microsoft/phi-2"
     bnb_config = create_bnb_config()
     model, tokenizer = load_model(model_name, bnb_config)
 
@@ -260,22 +292,7 @@ if __name__ == "__main__":
     tokenizer = AutoTokenizer.from_pretrained(model_name)
     tokenizer.save_pretrained(output_merged_dir)
     
-    '''
-    repo_name = "circircircle/GeneralQA-phi2"
+    model.config.to_json_file("adapter_config.json")
+    # push the fintuned model to huggingface
     model.push_to_hub(repo_name)
     tokenizer.push_to_hub(repo_name)
-    '''
-
-    #Easy test
-    print('Question')
-    text = "What are some signs that the stock market might crash?"
-
-    # Tokenize input 
-    inputs = tokenizer(text, return_tensors="pt")
-
-    # Get answer
-    # (Adjust max_new_tokens variable as you wish (maximum number of tokens the model can generate to answer the input))
-    outputs = model.generate(input_ids=inputs["input_ids"], attention_mask=inputs["attention_mask"], num_beams=5, temperature=0.7, max_new_tokens=50, pad_token_id=tokenizer.eos_token_id)
-
-    # Decode output & print it
-    print(tokenizer.decode(outputs[0], skip_special_tokens=True))

@@ -94,4 +94,4 @@ print(guanaco_processed.iloc[0])
 
 combined = pd.concat([dolly_processed, alpaca_processed, guanaco_processed], ignore_index=True)
 print(len(combined))
-combined.to_csv('../Datasets/generalQA.csv', index=False)
+combined.to_csv('generalQA.csv', index=False)
