@@ -1,0 +1,3 @@
+modelEmbeddings: "sentence-transformers/all-MiniLM-L6-v2"
+autoTokenizer: "circircircle/FinQA-phi2"
+autoModelForCausalLM: "circircircle/FinQA-phi2"
