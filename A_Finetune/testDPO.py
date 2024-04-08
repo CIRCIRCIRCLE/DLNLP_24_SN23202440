@@ -1,18 +1,19 @@
 from peft import AutoPeftModelForCausalLM
-from transformers import AutoTokenizer
+from transformers import AutoTokenizer, AutoModelForCausalLM
 import torch
 import re
 
 
 # In the DPO training process, only kept the LoRA parameters, so tokenizers need to be loaded from the Pre-trained SFT Model.
-model_name = "circircircle/FinDPO-Phi2"  
-token_name = "circircircle/FinQA-phi2"
-model = AutoPeftModelForCausalLM.from_pretrained(model_name)
-tokenizer = AutoTokenizer.from_pretrained(token_name)
+#model_name = "circircircle/FinDPO-Phi2"  
+#token_name = "circircircle/FinQA-phi2"
+repo_name = "circircircle/FinDPO-Phi2"
+model = AutoModelForCausalLM.from_pretrained(repo_name)
+tokenizer = AutoTokenizer.from_pretrained(repo_name)
 
 tokenizer.pad_token = tokenizer.eos_token
 
-device = torch.device("cuda:1") 
+device = torch.device("cuda:2") 
 model = model.to(device)
 model.eval()
 

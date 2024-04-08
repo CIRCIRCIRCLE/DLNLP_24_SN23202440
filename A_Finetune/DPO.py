@@ -13,10 +13,10 @@ import bitsandbytes as bnb
 #torch.cuda.set_device(device)
 
 #Load data and model
-peft_model_name = "circircircle/FinQA-phi2"
+base_model = "circircircle/FinQA-phi2"
 new_model ="FinDPO-Phi2" 
 
-tokenizer = AutoTokenizer.from_pretrained(peft_model_name)
+tokenizer = AutoTokenizer.from_pretrained(base_model)
 tokenizer.pad_token = tokenizer.eos_token
 tokenizer.padding_side = "left"
 
@@ -84,7 +84,7 @@ peft_config = LoraConfig(
 
 #Load a pretrained model to fine-tune
 model = AutoModelForCausalLM.from_pretrained(
-    peft_model_name,
+    base_model,
     device_map="auto",
     torch_dtype=torch.float16,
     load_in_4bit=True
@@ -93,14 +93,14 @@ model.config.use_cache = False
 
 #Reference model
 ref_model = AutoModelForCausalLM.from_pretrained(
-    peft_model_name,
+    base_model,
     device_map="auto",
     torch_dtype=torch.float16,
     load_in_4bit=True
 )
 
 #Tokenizer
-tokenizer = AutoTokenizer.from_pretrained(peft_model_name)
+tokenizer = AutoTokenizer.from_pretrained(base_model)
 tokenizer.pad_token = tokenizer.eos_token
 tokenizer.padding_side = "left"
 
@@ -144,32 +144,28 @@ dpo_trainer.train()
 #Save and upload the model
 #################################################################################
 # Save artifacts
-dpo_trainer.model.save_pretrained("final_checkpoint")
-tokenizer.save_pretrained("final_checkpoint")
+
+output_dir = "results/DPO/final_checkpoint"
+
+dpo_trainer.model.save_pretrained(output_dir)
+tokenizer.save_pretrained(output_dir)
 
 # Flush memory
 del dpo_trainer, model
 gc.collect()
 torch.cuda.empty_cache()
 
-base_model = AutoPeftModelForCausalLM.from_pretrained(
-    peft_model_name, 
-    low_cpu_mem_usage=True,
-    torch_dtype=torch.float16,
-)
-tokenizer = AutoTokenizer.from_pretrained(peft_model_name)
-
-# Merge base model with the adapter
-model = PeftModel.from_pretrained(base_model, "final_checkpoint")
+# DPO trained model
+model = AutoPeftModelForCausalLM.from_pretrained(output_dir, device_map='auto',torch_dtype=torch.bfloat16)
 model = model.merge_and_unload()
-
-output_merged_dir = "results/dpo/final_merged_checkpoint"
+output_merged_dir = "results/DPO/final_merged_checkpoint"
 os.makedirs(output_merged_dir, exist_ok=True)
-
-# Save model and tokenizer
 model.save_pretrained(output_merged_dir, safe_serialization=True)
+
+# save tokenizer for easy inference
+tokenizer = AutoTokenizer.from_pretrained(base_model)
 tokenizer.save_pretrained(output_merged_dir)
 
-# Push them to the HF Hub
+# push the fintuned model to huggingface
 model.push_to_hub('circircircle/FinDPO-Phi2')
 tokenizer.push_to_hub('circircircle/FinDPO-Phi2')

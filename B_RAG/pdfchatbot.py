@@ -24,7 +24,6 @@ class PDFChatBot:
         self.page = 0
         self.chat_history = []
         self.config = self.load_config(config_path)
-        # Initialize other attributes to None
         self.prompt = None
         self.documents = None
         self.embeddings = None

@@ -284,7 +284,7 @@ if __name__ == "__main__":
     model = AutoPeftModelForCausalLM.from_pretrained(output_dir, device_map="auto", torch_dtype=torch.bfloat16)
 
     model = model.merge_and_unload()
-    output_merged_dir = "results/llama2/final_merged_checkpoint"
+    output_merged_dir = "results/phi2/final_merged_checkpoint"
     os.makedirs(output_merged_dir, exist_ok=True)
     model.save_pretrained(output_merged_dir, safe_serialization=True)
 
@@ -292,7 +292,6 @@ if __name__ == "__main__":
     tokenizer = AutoTokenizer.from_pretrained(model_name)
     tokenizer.save_pretrained(output_merged_dir)
     
-    model.config.to_json_file("adapter_config.json")
     # push the fintuned model to huggingface
     model.push_to_hub(repo_name)
     tokenizer.push_to_hub(repo_name)

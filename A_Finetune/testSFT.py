@@ -15,7 +15,7 @@ def clean_text(text):
     text = re.sub(r'\n+', '\n', text).strip()
     return text
 
-repo_name = "circircircle/FinDPO-Phi2"
+repo_name = "circircircle/FinQA-phi2"
 model = AutoModelForCausalLM.from_pretrained(repo_name)
 tokenizer = AutoTokenizer.from_pretrained(repo_name)
 
