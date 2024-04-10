@@ -46,3 +46,42 @@ There is no definitive answer to this question as predicting a stock market cras
 
 ### B. RAG-Based PDF Chatbot
 <img src="imgs/RAGnvidia.png" alt="RAGeg" width="800">
+
+## Code Guidance:
+__requirements:__
+```
+pip install -r requirements.txt
+```
+__Use samples to test the trained models:__  
+```
+python main.py
+```
+### Data Preparation
+```python
+# For General Datasets Preparation
+python Datasets/DataPreprocessing.py
+# For Finance Specific Datasets Preparation
+python Datasets/FinDataPrep.py
+```
+
+### A-Financial QA Language Model  
+__Training:__ 
+```python
+# For GeneralQA Fine-tune
+python A_Finetune/SFT.py --model_name "microsoft/phi-2" --dataset "circircircle/generalQA" --repo_name "circircircle/GeneralQA-phi2"   
+# For FinQA Fine-tune
+python A_Finetune/SFT.py --model_name "circircircle/GeneralQA-phi2" --dataset "circircircle/FinQA" --repo_name "circircircle/FinQA-phi2"
+# For DPO Fine-tune
+python A_Finetune/DPO.py
+```
+__Testing:__
+```python
+python A_Finetune/testSFT.py
+python A_Finetune/testDPO.py  
+```
+
+### B. RAG-Based PDF Chatbot
+__Training and Testing:__
+```python
+python B_RAG/app.py  # Model and Embedding are set in config.yaml
+```
