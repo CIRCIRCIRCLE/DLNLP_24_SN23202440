@@ -1,8 +1,8 @@
-# Optimizing Financial NLP with Phi-2 through QLoRA and DPO:
+# Optimizing Financial NLP with Phi-2 through QLoRA and DPO
 This repository is the assignment of ELEC0141 Deep Learning and Natural Language Processing, UCL 2024
 
 ## Description:   
-This project explores the enhancement of financial Natural Language Processing using the Phi-2 transformer model. By integrating  __QLoRA__ (Quantized Low-Rank Adaptation) for efficient fine-tuning and __DPO__ (Direct Preference Optimization) for aligning outputs with human preferences. Further enrichment is achieved through __RAG__(Retrieval-Augmented Generation) and Langchain, enabling document-based interactions. This study demonstrates significant improvements in processing financial data. 
+This project delves into advancing financial Natural Language Processing (NLP) with the Phi-2 transformer model. It integrates __QLoRA__ (Quantized Low-Rank Adaptation) for efficient fine-tuning and __DPO__ (Direct Preference Optimization) to align model outputs with human preferences. Additionally, enhancements through __RAG__ (Retrieval-Augmented Generation) and Langchain facilitate document-based interactions. The study showcases marked improvements in the processing of financial data, illustrating the transformative potential of these methodologies in the financial NLP landscape.
 
 `Used methods:`
 - __QLoRA:__ For parameter-efficient fine-tuning, maintaining performance while reducing computational demands. [Paper Link](https://arxiv.org/abs/2305.14314)
