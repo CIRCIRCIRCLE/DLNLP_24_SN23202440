@@ -1,4 +1,3 @@
-How does RAG work?
 - Create a document with facts
 - embed the facts to get vectors (store vectors on your end)
 - when a bot recieves a question about facts, embed the question to get it’s vector, 

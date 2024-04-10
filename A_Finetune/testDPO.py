@@ -4,9 +4,6 @@ import torch
 import re
 
 
-# In the DPO training process, only kept the LoRA parameters, so tokenizers need to be loaded from the Pre-trained SFT Model.
-#model_name = "circircircle/FinDPO-Phi2"  
-#token_name = "circircircle/FinQA-phi2"
 repo_name = "circircircle/FinDPO-Phi2"
 model = AutoModelForCausalLM.from_pretrained(repo_name)
 tokenizer = AutoTokenizer.from_pretrained(repo_name)
